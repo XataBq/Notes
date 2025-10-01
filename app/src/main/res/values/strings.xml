@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Notes</string>
+    <string name="write_note_hint">Write your note here…</string>
+</resources>
