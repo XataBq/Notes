@@ -8,7 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.notes.model.Note
 import com.example.notes.R
 
-class NoteAdapter(private val notes: MutableList<Note>) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>(){
+class NoteAdapter(
+    private val notes: MutableList<Note>,
+    private val onNoteClick: (Note, Int) -> Unit
+    ) : RecyclerView.Adapter<NoteAdapter.NoteViewHolder>() {
 
     class NoteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleView: TextView = itemView.findViewById(R.id.tvTitle)
@@ -32,8 +35,7 @@ class NoteAdapter(private val notes: MutableList<Note>) : RecyclerView.Adapter<N
         holder.contentView.text = note.content
 
         holder.itemView.setOnClickListener {
-            notes.removeAt(position)
-            notifyItemRemoved(position)
+            onNoteClick(note, position)
         }
     }
 
@@ -44,6 +46,11 @@ class NoteAdapter(private val notes: MutableList<Note>) : RecyclerView.Adapter<N
     fun addNote(note: Note) {
         notes.add(0, note)
         notifyItemInserted(0)
+    }
+
+    fun removeNote(position: Int){
+        notes.removeAt(position)
+        notifyItemRemoved(position)
     }
 
 }

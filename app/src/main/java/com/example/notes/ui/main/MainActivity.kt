@@ -6,6 +6,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     private val binding
         get() = _binding ?: throw IllegalStateException("ActivityMainBinding can't be null")
 
+    lateinit var adapter: NoteAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
@@ -26,8 +29,19 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val notes: MutableList<Note> = mutableListOf<Note>()
+        binding.tvNotesSize.text = "notes.size: ${notes.size}"
         binding.rvNotes.layoutManager = LinearLayoutManager(this)
-        val adapter = NoteAdapter(notes)
+        adapter = NoteAdapter(notes) { note, position ->
+            AlertDialog.Builder(this)
+                .setTitle("Удалить заметку?")
+                .setMessage("Вы уверены, что хотите удалить \"${note.title}\" ")
+                .setPositiveButton("Удалить") { _, _ ->
+                    adapter.removeNote(position)
+                    binding.tvNotesSize.text = "notes.size: ${notes.size}"
+                }
+                .setNegativeButton("Отмена", null)
+                .show()
+        }
         binding.rvNotes.adapter = adapter
         binding.rvNotes.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
 
@@ -45,12 +59,16 @@ class MainActivity : AppCompatActivity() {
 
             btnNoteAdd.setOnClickListener {
                 val text: String = etNoteText.text.toString().trim()
+                val title: String = etTitle.text.toString().trim()
                 if (text.isNotEmpty()) {
-                    val newNote = Note(content = text)
+                    val newNote: Note =
+                        if (title.isEmpty()) Note(content = text) else Note(title, text)
                     adapter.addNote(newNote)
                     rvNotes.scrollToPosition(0)
+                    tvNotesSize.text = "notes.size: ${notes.size}"
                     Toast.makeText(this@MainActivity, "Note added", Toast.LENGTH_SHORT).show()
                     etNoteText.text.clear()
+                    etTitle.text.clear()
                 } else {
                     Toast.makeText(this@MainActivity, "Note is empty", Toast.LENGTH_SHORT).show()
                 }

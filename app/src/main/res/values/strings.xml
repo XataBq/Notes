@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Notes</string>
     <string name="write_note_hint">Write your note here…</string>
+    <string name="title_your_note">Title your note…</string>
 </resources>
